@@ -48,6 +48,7 @@ Object.keys(ifaces).forEach(function (ifname) {
 
 app.use("/api/appVersion", require("./routers/app_version"));
 app.use("/api/notify", require("./routers/notify"));
+app.use("/api/user", require("./routers/user"));
 
 app.use(exceptionHandler);
 

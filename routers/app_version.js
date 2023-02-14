@@ -12,95 +12,113 @@ var {
   convertException,
 } = require("../components/exception/exception_creator");
 
-router.post("", auth.isAdmin, (req, res) => {
-  const content = new ModelAppVersion(req.body);
-  content
-    .save()
-    .then((_) => res.json(response.success(_)))
-    .catch((_) => {
-      var error = convertException(_);
-      res.json(response.fail(error, error.errmsg, error.code));
-    });
+router.post("", auth.isAdmin, async (req, res) => {
+  try {
+    const model = new ModelAppVersion(req.body);
+    const cursor = await model.save();
+
+    res.json(response.success(cursor));
+  } catch (e) {
+    console.log(e);
+    var error = convertException(e);
+    res.json(response.fail(error, error.errmsg, error.code));
+  }
 });
 
-router.get("/", auth.isAdmin, (req, res) => {
-  ModelAppVersion.find()
-    .sort({ appVerCode: 1 })
-    .then((_) => res.json(response.success(_)))
-    .catch((_) => {
-      var error = convertException(_);
-      res.json(response.fail(error, error.errmsg, error.code));
-    });
+router.get("/", auth.isAdmin, async (req, res) => {
+  try {
+    const cursor = await ModelAppVersion.find().sort({ appVerCode: 1 }).exec();
+
+    res.json(response.success(cursor));
+  } catch (e) {
+    console.log(e);
+    var error = convertException(e);
+    res.json(response.fail(error, error.errmsg, error.code));
+  }
 });
 
-router.get("/:ver", (req, res) => {
-  ModelAppVersion.aggregate([
-    {
-      $match: {
-        $and: [
-          {
-            appVerCode: Number(req.params.ver),
-          },
-          { isShow: true },
-        ],
+router.get("/:ver", async (req, res) => {
+  try {
+    const cursor = await ModelAppVersion.aggregate([
+      {
+        $match: {
+          $and: [
+            {
+              appVerCode: Number(req.params.ver),
+            },
+            { isShow: true },
+          ],
+        },
       },
-    },
-  ])
-    .then((_) => {
-      res.json(response.success(_));
-    })
-    .catch((_) => {
-      var error = convertException(_);
-      res.json(response.fail(error, error.errmsg, error.code));
-    });
+    ]).exec();
+
+    res.json(response.success(cursor));
+  } catch (e) {
+    console.log(e);
+    var error = convertException(e);
+    res.json(response.fail(error, error.errmsg, error.code));
+  }
 });
 
-router.get("/after/:ver", (req, res) => {
-  ModelAppVersion.aggregate([
-    {
-      $match: {
-        $and: [
-          {
-            appVerCode: { $gt: Number(req.params.ver) },
-          },
-          { isShow: true },
-        ],
+router.get("/after/:ver", async (req, res) => {
+  try {
+    const cursor = await ModelAppVersion.aggregate([
+      {
+        $match: {
+          $and: [
+            {
+              appVerCode: { $gt: Number(req.params.ver) },
+            },
+            { isShow: true },
+          ],
+        },
       },
-    },
-    {
-      $group: {
-        _id: null,
-        appVerCode: { $max: "$appVerCode" },
-        say: { $last: "$say" },
-        isMustUpdate: { $max: "$isMustUpdate" },
+      {
+        $group: {
+          _id: null,
+          appVerCode: { $max: "$appVerCode" },
+          say: { $last: "$say" },
+          isMustUpdate: { $max: "$isMustUpdate" },
+        },
       },
-    },
-  ])
-    .then((_) => {
-      res.json(response.success(_));
-    })
-    .catch((_) => {
-      var error = convertException(_);
-      res.json(response.fail(error, error.errmsg, error.code));
-    });
+    ]).exec();
+
+    res.json(response.success(cursor));
+  } catch (e) {
+    console.log(e);
+    var error = convertException(e);
+    res.json(response.fail(error, error.errmsg, error.code));
+  }
 });
 
-router.patch("/:_id", auth.isAdmin, (req, res) => {
-  ModelAppVersion.findByIdAndUpdate(req.params._id, { $set: req.body })
-    .then((_) => res.json(response.success(_)))
-    .catch((_) => {
-      var error = convertException(_);
-      res.json(response.fail(error, error.errmsg, error.code));
-    });
+router.patch("/:_id", auth.isAdmin, async (req, res) => {
+  try {
+    const cursor = await ModelAppVersion.findByIdAndUpdate(req.params._id, {
+      $set: req.body,
+    }).exec();
+
+    res.json(response.success(cursor));
+  } catch (e) {
+    console.log(e);
+    var error = convertException(e);
+    res.json(response.fail(error, error.errmsg, error.code));
+  }
 });
 
-router.delete("/:_id", auth.isAdmin, (req, res) => {
-  ModelAppVersion.findByIdAndDelete(req.params._id)
-    .then((_) => res.json(response.success(_)))
-    .catch((_) => {
-      var error = convertException(_);
-      res.json(response.fail(error, error.errmsg, error.code));
-    });
+router.delete("/:_id", auth.isAdmin, async (req, res) => {
+  //isDelete
+  //deletedAt
+  try {
+    const cursor = await ModelAppVersion.findByIdAndUpdate(req.params._id, {
+      $set: req.body,
+    }).exec();
+
+    res.json(response.success(cursor));
+  } catch (e) {
+    console.log(e);
+    var error = convertException(e);
+    res.json(response.fail(error, error.errmsg, error.code));
+  }
 });
 
 module.exports = router;

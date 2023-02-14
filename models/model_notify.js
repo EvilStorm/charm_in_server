@@ -8,7 +8,6 @@ const schema = new Schema(
     say: { type: String },
     isAppStop: { type: Boolean, default: false },
     isImportant: { type: Boolean, default: false },
-    isDelete: { type: Boolean, default: true },
     isDelete: { type: Boolean, default: false },
     deletedAt: { type: Date },
     createdAt: { type: Date, default: Date.now },

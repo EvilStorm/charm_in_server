@@ -13,6 +13,7 @@ const schema = new Schema(
       ref: "UserExtendInfo",
       unique: true,
     },
+    setting: { type: Schema.Types.ObjectId, ref: "Setting", default: null },
     isDelete: { type: Boolean, default: false },
     deletedAt: { type: Date },
     createdAt: { type: Date, default: Date.now },
