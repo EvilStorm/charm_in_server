@@ -1,0 +1,30 @@
+
+    # appVerCode: { type: Number, index: true },
+    # appVerName: { type: String },
+    # say: { type: String },
+    # os: { type: String },
+    # isMustUpdate: { type: Boolean, default: false },
+    # isShow: { type: Boolean, default: true },
+    # isDelete: { type: Boolean, default: false },
+    # deletedAt: { type: Date },
+    # createdAt: { type: Date, default: Date.now },
+###
+POST http://localhost:2394/api/v1/appVer
+content-type: application/json
+Authorization: admin
+id: 1
+
+{
+    "appVerCode": 2,
+    "appVerName": "0.0.2",
+    "say": "개발 시작되었습니다.22",
+    "os": "A"
+}
+
+
+###
+GET http://localhost:2394/api/v1/appVer/latest
+content-type: application/json
+identifyid: admin
+id: 1
+

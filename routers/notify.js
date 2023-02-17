@@ -36,7 +36,7 @@ router.post("", async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const cursor = await ModelNotify.where().sort({ seq: -1 }).exec();
+    const cursor = await ModelNotify.where().sort({ seq: -1 }).lean().exec();
 
     res.json(response.success(cursor));
   } catch (e) {
@@ -50,7 +50,9 @@ router.get("/:seq", async (req, res) => {
   try {
     const cursor = await ModelNotify.where({
       $and: [{ show: true }, { seq: Number(req.params.seq) }],
-    }).exec();
+    })
+      .lean()
+      .exec();
 
     res.json(response.success(cursor));
   } catch (e) {
@@ -66,6 +68,7 @@ router.get("/page/:page", async (req, res) => {
       .sort({ createdAt: -1 })
       .skip(PAGE_COUNT * req.params.page)
       .limit(PAGE_COUNT)
+      .lean()
       .exec();
 
     res.json(response.success(cursor));
@@ -81,6 +84,7 @@ router.get("/count/:count", async (req, res) => {
     const cursor = await ModelNotify.where({ show: true })
       .sort({ createdAt: -1 })
       .limit(parseInt(req.params.count))
+      .lean()
       .exec();
 
     res.json(response.success(cursor));
@@ -101,6 +105,7 @@ router.get("/main/:seq", async (req, res) => {
       ],
     })
       .sort({ createdAt: -1 })
+      .lean()
       .exec();
 
     res.json(response.success(cursor));
@@ -116,7 +121,9 @@ router.patch("/:_id", async (req, res) => {
     const cursor = await ModelNotify.findOneAndUpdate(
       { _id: req.params._id },
       { $set: req.body }
-    ).exec();
+    )
+      .lean()
+      .exec();
 
     res.json(response.success(cursor));
   } catch (e) {
@@ -131,7 +138,9 @@ router.delete("/:_id", async (req, res) => {
     const cursor = await ModelNotify.findOneAndUpdate(
       { _id: req.params._id },
       { $set: { delete: false } }
-    ).exec();
+    )
+      .lean()
+      .exec();
 
     res.json(response.success(cursor));
   } catch (e) {

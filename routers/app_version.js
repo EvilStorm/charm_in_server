@@ -27,7 +27,30 @@ router.post("", auth.isAdmin, async (req, res) => {
 
 router.get("/", auth.isAdmin, async (req, res) => {
   try {
-    const cursor = await ModelAppVersion.find().sort({ appVerCode: 1 }).exec();
+    const cursor = await ModelAppVersion.find()
+      .select("appVerCode appVerName say os isMustUpdate ")
+      .sort({ appVerCode: 1 })
+      .lean()
+      .exec();
+    cursor.id = cursor._id;
+    res.json(response.success(cursor));
+  } catch (e) {
+    console.log(e);
+    var error = convertException(e);
+    res.json(response.fail(error, error.errmsg, error.code));
+  }
+});
+
+router.get("/latest", async (req, res) => {
+  try {
+    const cursor = await ModelAppVersion.findOne({
+      isDelete: false,
+      isShow: true,
+    })
+      .select("appVerCode appVerName say os isMustUpdate ")
+      .sort({ createdAt: -1 })
+      .lean()
+      .exec();
 
     res.json(response.success(cursor));
   } catch (e) {
@@ -50,7 +73,9 @@ router.get("/:ver", async (req, res) => {
           ],
         },
       },
-    ]).exec();
+    ])
+      .lean()
+      .exec();
 
     res.json(response.success(cursor));
   } catch (e) {
@@ -81,7 +106,9 @@ router.get("/after/:ver", async (req, res) => {
           isMustUpdate: { $max: "$isMustUpdate" },
         },
       },
-    ]).exec();
+    ])
+      .lean()
+      .exec();
 
     res.json(response.success(cursor));
   } catch (e) {
@@ -95,7 +122,9 @@ router.patch("/:_id", auth.isAdmin, async (req, res) => {
   try {
     const cursor = await ModelAppVersion.findByIdAndUpdate(req.params._id, {
       $set: req.body,
-    }).exec();
+    })
+      .lean()
+      .exec();
 
     res.json(response.success(cursor));
   } catch (e) {
@@ -111,7 +140,9 @@ router.delete("/:_id", auth.isAdmin, async (req, res) => {
   try {
     const cursor = await ModelAppVersion.findByIdAndUpdate(req.params._id, {
       $set: req.body,
-    }).exec();
+    })
+      .lean()
+      .exec();
 
     res.json(response.success(cursor));
   } catch (e) {

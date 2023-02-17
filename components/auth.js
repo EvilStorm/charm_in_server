@@ -39,10 +39,10 @@ auth.isSignIn = function (req, res, next) {
 };
 
 auth.isAdmin = function (req, res, next) {
-  var token = req.headers["Authorization"];
+  var token = req.headers["authorization"];
   if (token != null && token == "admin") {
     req.decoded = {
-      token: req.headers["Authorization"],
+      token: req.headers["authorization"],
       id: req.headers["userid"],
     };
     next();
