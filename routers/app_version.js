@@ -60,7 +60,7 @@ router.get("/latest", async (req, res) => {
   }
 });
 
-router.get("/:ver", async (req, res) => {
+router.get("/:ver/:os", async (req, res) => {
   try {
     const cursor = await ModelAppVersion.aggregate([
       {
@@ -73,9 +73,7 @@ router.get("/:ver", async (req, res) => {
           ],
         },
       },
-    ])
-      .lean()
-      .exec();
+    ]).exec();
 
     res.json(response.success(cursor));
   } catch (e) {
@@ -85,7 +83,7 @@ router.get("/:ver", async (req, res) => {
   }
 });
 
-router.get("/after/:ver", async (req, res) => {
+router.get("/after/:ver/:os", async (req, res) => {
   try {
     const cursor = await ModelAppVersion.aggregate([
       {
@@ -102,15 +100,15 @@ router.get("/after/:ver", async (req, res) => {
         $group: {
           _id: null,
           appVerCode: { $max: "$appVerCode" },
+          appVerName: { $max: "$appVerName" },
+          os: { $last: "$os" },
           say: { $last: "$say" },
           isMustUpdate: { $max: "$isMustUpdate" },
         },
       },
-    ])
-      .lean()
-      .exec();
+    ]).exec();
 
-    res.json(response.success(cursor));
+    res.json(response.success(cursor[0]));
   } catch (e) {
     console.log(e);
     var error = convertException(e);
