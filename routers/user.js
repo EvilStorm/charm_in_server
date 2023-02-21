@@ -4,6 +4,7 @@ var router = express.Router();
 const ModelUser = require("../models/model_user");
 const ModelUserExtend = require("../models/model_user_extend");
 const ModelSetting = require("../models/model_setting");
+const ModelAuthToken = require("../models/model_token_store");
 var response = require("../components/response/response_util");
 var { ResponseCode } = require("../components/response/response_code_store");
 var {
@@ -11,6 +12,7 @@ var {
   createException,
   convertException,
 } = require("../components/exception/exception_creator");
+const { makeToken, tokenPayLoad } = require("../components/jwt");
 
 module.exports = router;
 
@@ -27,8 +29,11 @@ router.post("", async (req, res) => {
     setting.owner = user._id;
     await setting.save();
 
+    console.log(`extend._id: ${extend._id}`);
+    console.log(`setting._id: ${setting._id}`);
     user.extendInfo = extend._id;
     user.setting = setting._id;
+    await user.save();
 
     res.json(response.success(user));
   } catch (e) {
@@ -37,6 +42,38 @@ router.post("", async (req, res) => {
     res.json(response.fail(error, error.errmsg, error.code));
   }
 });
+
+router.post("/signIn", async (req, res) => {
+  try {
+    const user = await ModelUser.findOne({ firebaseId: req.body.firebaseId })
+      .populate("extendInfo", "-owner -updatedAt")
+      .populate("setting", "-owner")
+      .lean()
+      .exec();
+
+    const jetToken = await saveAuthToken(user._id, user.joinType);
+    var result = { ...user, authToken: { ...jetToken } };
+
+    res.json(response.success(result));
+  } catch (e) {
+    console.log(e);
+    var error = convertException(e);
+    res.json(response.fail(error, error.errmsg, error.code));
+  }
+});
+
+async function saveAuthToken(userId, joinType) {
+  const payload = tokenPayLoad(userId, joinType);
+  const jwtToken = makeToken(payload);
+
+  let token = new ModelAuthToken();
+  token.userId = userId;
+  token.token = jwtToken.token;
+  token.refreshToken = jwtToken.refreshToken;
+  const tokenResult = await token.save();
+
+  return tokenResult.toJSON();
+}
 
 router.get("/:_id", async (req, res) => {
   try {

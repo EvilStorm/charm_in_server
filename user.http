@@ -14,7 +14,7 @@
     # createdAt: { type: Date, default: Date.now },
 
 ###
-POST http://localhost:2394/api/user
+POST http://localhost:2394/api/v1/user
 content-type: application/json
 identifyid: admin
 id: 1
@@ -24,6 +24,18 @@ id: 1
     "email": "sample222@sample.com",
     "joinType": 0
 }
+
+
+###
+POST http://localhost:2394/api/v1/user/signIn
+content-type: application/json
+identifyid: admin
+id: 1
+
+{
+    "firebaseId": "ZECCyuX68CbnBiW8x6jaxghKgLq2"
+}
+
 ###
 PATCH http://localhost:2394/api/user/63ec27a21e49f48c69eac573
 content-type: application/json

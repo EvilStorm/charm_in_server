@@ -3,7 +3,7 @@ var Schema = mongoose.Schema;
 
 const schema = new Schema(
   {
-    owner: { type: Schema.Types.ObjectId, ref: "User" },
+    owner: { type: Schema.Types.ObjectId, ref: "User", index: true },
     answerAlarm: { type: Boolean, default: true },
     systemAlarm: { type: Boolean, default: true },
     eventAlarm: { type: Boolean, default: true },
