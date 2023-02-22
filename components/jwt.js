@@ -5,10 +5,10 @@ const secretKey = process.env.JWT_SECRET_KEY;
 const tokenDate = process.env.JWT_TIME;
 const refreshTokenDate = process.env.JWT_REFRESH_TIME;
 
-function tokenPayLoad(userId, loginType) {
+function tokenPayLoad(userId, joinType) {
   return {
     userId: userId,
-    loginType: loginType,
+    joinType: joinType,
   };
 }
 /**

@@ -14,36 +14,11 @@
     # createdAt: { type: Date, default: Date.now },
 
 ###
-POST http://localhost:2394/api/v1/user
+POST http://localhost:2394/api/v1/token/refresh
 content-type: application/json
-identifyid: admin
-id: 1
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2M2Y1NjEyN2IxNDc2MDVhM2Y1NWM3MDciLCJqb2luVHlwZSI6MCwiaWF0IjoxNjc3MDI1NjU2LCJleHAiOjE2NzcxMTIwNTZ9.rRNFYiAuvg-2VhjCqPF2hYEBPS1z9oPePeqNmxL4yBk
+userId: 63f45c0109a9aa488b12c21a
 
 {
-    "firebaseId": "adlkjqwdlkasd", 
-    "email": "sample222@sample.com",
-    "joinType": 0
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2M2Y1NjEyN2IxNDc2MDVhM2Y1NWM3MDciLCJqb2luVHlwZSI6MCwiaWF0IjoxNjc3MDI1NzgzLCJleHAiOjE5MzYyMjU3ODN9.ajLigUi1TwuC2sxZT8ne7iqEzFP0x7W7_PjizXqloXk"
 }
-
-
-###
-POST http://localhost:2394/api/v1/user/signIn
-content-type: application/json
-identifyid: admin
-id: 1
-
-{
-    "firebaseId": "jNBo8ZhiKlY9gKgGc76uv3d7MWi1"
-}
-
-###
-PATCH http://localhost:2394/api/user/63ec27a21e49f48c69eac573
-content-type: application/json
-identifyid: admin
-id: 1
-
-{
-    "gender": 0,
-    "nickName": "Sample!!!"
-}
-

@@ -6,32 +6,36 @@ var {
   createException,
   convertException,
 } = require("./exception/exception_creator");
-const { header } = require("express/lib/request");
-
+var { decodePayload } = require("./jwt");
 auth = {};
 
 auth.signCondition = function (req, res, next) {
-  var token = req.headers["Authorization"];
-  var userId = req.headers["userid"];
+  var token = req.headers["authorization"];
+  // var userId = req.headers["userid"];
+  const decodedToken = decodePayload(token);
+
   req.decoded = {
     token: token,
-    id: userId,
+    id: decodedToken.userId,
+    joinType: decodedToken.joinType,
   };
 
   next();
 };
 
 auth.isSignIn = function (req, res, next) {
-  var token = req.headers["Authorization"];
-  var userId = req.headers["userid"];
+  var token = req.headers["authorization"];
+  // var userId = req.headers["userid"];
+  const decodedToken = decodePayload(token);
 
-  if (!token || !userId) {
+  if (!token || !decodedToken.userId) {
     var error = createException(ExceptionType.REQUIRED_JWT_TOKEN);
     res.json(response.fail(error, error.errmsg, error.code));
   } else {
     req.decoded = {
       token: token,
-      id: userId,
+      id: decodedToken.userId,
+      joinType: decodedToken.joinType,
     };
 
     next();
@@ -40,10 +44,13 @@ auth.isSignIn = function (req, res, next) {
 
 auth.isAdmin = function (req, res, next) {
   var token = req.headers["authorization"];
+  const decodedToken = decodePayload(token);
+
   if (token != null && token == "admin") {
     req.decoded = {
       token: req.headers["authorization"],
-      id: req.headers["userid"],
+      id: 1,
+      joinType: 0,
     };
     next();
   } else {

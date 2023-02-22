@@ -14,8 +14,6 @@ var {
 } = require("../components/exception/exception_creator");
 const { makeToken, tokenPayLoad } = require("../components/jwt");
 
-module.exports = router;
-
 router.post("", async (req, res) => {
   try {
     const userModel = new ModelUser(req.body);
@@ -65,6 +63,15 @@ router.post("/signIn", async (req, res) => {
 async function saveAuthToken(userId, joinType) {
   const payload = tokenPayLoad(userId, joinType);
   const jwtToken = makeToken(payload);
+
+  let cursor = await ModelAuthToken.findOne({ userId: userId });
+
+  if (cursor != null) {
+    cursor.token = jwtToken.token;
+    cursor.refreshToken = jwtToken.refreshToken;
+    const result = await cursor.save();
+    return result.toJSON();
+  }
 
   let token = new ModelAuthToken();
   token.userId = userId;

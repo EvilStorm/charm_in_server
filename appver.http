@@ -25,6 +25,6 @@ id: 1
 ###
 GET http://localhost:2394/api/v1/appVer/latest
 content-type: application/json
-identifyid: admin
+Authorization: admin
 id: 1
 
