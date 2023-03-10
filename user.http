@@ -37,6 +37,12 @@ id: 1
 }
 
 ###
+POST http://localhost:2394/api/v1/user/signIn/token
+content-type: application/json
+authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NDBhOGNiNzFlNDljMmVhNDRiNDJiNGQiLCJqb2luVHlwZSI6MCwiaWF0IjoxNjc4NDEzNzE4LCJleHAiOjE2Nzg1MDAxMTh9.5109eJERf-PS0fVn76FdLbNctpNIjfvT8zq6Y9_8bqk
+
+
+###
 PATCH http://localhost:2394/api/user/63ec27a21e49f48c69eac573
 content-type: application/json
 identifyid: admin

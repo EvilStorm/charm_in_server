@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 
+var mongoose = require("mongoose");
 const ModelUser = require("../models/model_user");
 const ModelUserExtend = require("../models/model_user_extend");
 const ModelSetting = require("../models/model_setting");
@@ -13,6 +14,7 @@ var {
   convertException,
 } = require("../components/exception/exception_creator");
 const { makeToken, tokenPayLoad } = require("../components/jwt");
+const auth = require("../components/auth");
 
 router.post("", async (req, res) => {
   try {
@@ -51,6 +53,28 @@ router.post("/signIn", async (req, res) => {
 
     const jetToken = await saveAuthToken(user._id, user.joinType);
     var result = { ...user, authToken: { ...jetToken } };
+
+    res.json(response.success(result));
+  } catch (e) {
+    console.log(e);
+    var error = convertException(e);
+    res.json(response.fail(error, error.errmsg, error.code));
+  }
+});
+
+router.post("/signIn/token", auth.isSignIn, async (req, res) => {
+  try {
+    console.log(req.decoded);
+    console.log(req.decoded.id);
+
+    const userModel = await ModelUser.findById(req.decoded.id)
+      .populate("extendInfo", "-owner -updatedAt")
+      .populate("setting", "-owner")
+      .lean()
+      .exec();
+
+    const jwtToken = await saveAuthToken(userModel._id, userModel.joinType);
+    var result = { ...userModel, authToken: { ...jwtToken } };
 
     res.json(response.success(result));
   } catch (e) {
