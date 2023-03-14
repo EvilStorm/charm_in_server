@@ -50,6 +50,7 @@ app.use("/api/v1/appVer", require("./routers/app_version"));
 app.use("/api/v1/notify", require("./routers/notify"));
 app.use("/api/v1/user", require("./routers/user"));
 app.use("/api/v1/token", require("./routers/token"));
+app.use("/api/v1/auth", require("./routers/auth"));
 
 app.use(exceptionHandler);
 

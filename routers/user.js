@@ -106,6 +106,22 @@ async function saveAuthToken(userId, joinType) {
   return tokenResult.toJSON();
 }
 
+router.get("/find/firebaseId/:firebaseId", async (req, res) => {
+  try {
+    const result = await ModelUser.findOne({
+      firebaseId: req.params.firebaseId,
+    })
+      .lean()
+      .exec();
+
+    res.json(response.success(result));
+  } catch (e) {
+    console.log(e);
+    var error = convertException(e);
+    res.json(response.fail(error, error.errmsg, error.code));
+  }
+});
+
 router.get("/:_id", async (req, res) => {
   try {
     var cursor = await ModelUser.findOne({
