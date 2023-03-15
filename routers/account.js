@@ -2,8 +2,8 @@ var express = require("express");
 var router = express.Router();
 
 var mongoose = require("mongoose");
-const ModelUser = require("../models/model_user");
-const ModelUserExtend = require("../models/model_user_extend");
+const AccountModel = require("../models/model_account");
+const UserModel = require("../models/model_user");
 const ModelSetting = require("../models/model_setting");
 const ModelAuthToken = require("../models/model_token_store");
 var response = require("../components/response/response_util");
@@ -18,24 +18,24 @@ const auth = require("../components/auth");
 
 router.post("", async (req, res) => {
   try {
-    const userModel = new ModelUser(req.body);
-    const user = await userModel.save();
+    const accountModel = new AccountModel(req.body);
+    const account = await accountModel.save();
 
-    let extend = new ModelUserExtend();
-    extend.owner = user._id;
-    await extend.save();
+    let userModel = new UserModel();
+    userModel.owner = account._id;
+    await userModel.save();
 
     let setting = new ModelSetting();
-    setting.owner = user._id;
+    setting.owner = account._id;
     await setting.save();
 
-    console.log(`extend._id: ${extend._id}`);
+    console.log(`userModel._id: ${userModel._id}`);
     console.log(`setting._id: ${setting._id}`);
-    user.extendInfo = extend._id;
-    user.setting = setting._id;
-    await user.save();
+    account.userInfo = userModel._id;
+    account.setting = setting._id;
+    await account.save();
 
-    res.json(response.success(user));
+    res.json(response.success(account));
   } catch (e) {
     console.log(e);
     var error = convertException(e);
@@ -45,14 +45,16 @@ router.post("", async (req, res) => {
 
 router.post("/signIn", async (req, res) => {
   try {
-    const user = await ModelUser.findOne({ firebaseId: req.body.firebaseId })
-      .populate("extendInfo", "-owner -updatedAt")
+    const account = await AccountModel.findOne({
+      firebaseId: req.body.firebaseId,
+    })
+      .populate("userInfo", "-owner -updatedAt")
       .populate("setting", "-owner")
       .lean()
       .exec();
 
-    const jetToken = await saveAuthToken(user._id, user.joinType);
-    var result = { ...user, authToken: { ...jetToken } };
+    const jetToken = await saveAuthToken(account._id, account.joinType);
+    var result = { ...account, authToken: { ...jetToken } };
 
     res.json(response.success(result));
   } catch (e) {
@@ -67,14 +69,17 @@ router.post("/signIn/token", auth.isSignIn, async (req, res) => {
     console.log(req.decoded);
     console.log(req.decoded.id);
 
-    const userModel = await ModelUser.findById(req.decoded.id)
-      .populate("extendInfo", "-owner -updatedAt")
+    const accountModel = await AccountModel.findById(req.decoded.id)
+      .populate("userInfo", "-owner -updatedAt")
       .populate("setting", "-owner")
       .lean()
       .exec();
 
-    const jwtToken = await saveAuthToken(userModel._id, userModel.joinType);
-    var result = { ...userModel, authToken: { ...jwtToken } };
+    const jwtToken = await saveAuthToken(
+      accountModel._id,
+      accountModel.joinType
+    );
+    var result = { ...accountModel, authToken: { ...jwtToken } };
 
     res.json(response.success(result));
   } catch (e) {
@@ -108,7 +113,7 @@ async function saveAuthToken(userId, joinType) {
 
 router.get("/find/firebaseId/:firebaseId", async (req, res) => {
   try {
-    const result = await ModelUser.findOne({
+    const result = await AccountModel.findOne({
       firebaseId: req.params.firebaseId,
     })
       .lean()
@@ -124,7 +129,7 @@ router.get("/find/firebaseId/:firebaseId", async (req, res) => {
 
 router.get("/:_id", async (req, res) => {
   try {
-    var cursor = await ModelUser.findOne({
+    var cursor = await AccountModel.findOne({
       _id: req.params._id,
     })
       .populate("setting")
@@ -139,20 +144,17 @@ router.get("/:_id", async (req, res) => {
   }
 });
 
-router.patch("/:_id", async (req, res) => {
+router.patch("", auth.isSignIn, async (req, res) => {
+  console.log(req.decoded.id);
+  console.log(req.body);
   try {
-    const user = await ModelUser.findById(req.params._id)
-      .populate("extendInfo")
-      .lean()
-      .exec();
-    console.log(user);
+    var cursor = await AccountModel.findByIdAndUpdate(
+      req.decoded.id,
+      req.body
+    ).exec();
 
-    // var cursor = await ModelUserExtend.findByIdAndUpdate(
-    //   user.extendInfo._id,
-    //   req.body
-    // ).exec();
-
-    res.json(response.success(user));
+    console.log(cursor);
+    res.json(response.success(cursor));
   } catch (e) {
     console.log(e);
     var error = convertException(e);

@@ -3,20 +3,21 @@ var Schema = mongoose.Schema;
 
 const schema = new Schema(
   {
-    firebaseId: { type: String, index: true, unique: true },
-    email: { type: String, index: true },
-    emailValification: { type: Boolean, default: false },
-    joinType: { type: Number, default: 0 }, //0: 회원가입, 1:구글, 2: 카카오, 3: 페이스북, 4: 애플
-    secureLevel: { type: Number, default: 0 }, //0: 일반, 6: 관리자, 9: 모든 권한
-    setting: { type: Schema.Types.ObjectId, ref: "Setting", default: null },
-    extendInfo: {
+    owner: {
       type: Schema.Types.ObjectId,
-      ref: "UserExtendInfo",
-      default: null,
+      ref: "Account",
+      index: true,
     },
-    isDelete: { type: Boolean, default: false },
-    deletedAt: { type: Date },
-    createdAt: { type: Date, default: Date.now },
+    gender: { type: Number, default: 0 }, //0: 남자, 1: 여자
+    nickName: { type: String, default: null },
+    say: { type: String, default: null },
+    height: { type: Number, default: null },
+    birthDay: { type: Date, default: null },
+    religion: { type: Schema.Types.ObjectId, ref: "Religion" },
+    mbti: { type: Schema.Types.ObjectId, ref: "MBTI" },
+    image_url: { type: String, default: null },
+    pushToken: { type: String, default: null },
+    updatedAt: { type: Date, default: Date.now },
   },
   {
     versionKey: false,
